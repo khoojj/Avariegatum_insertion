@@ -42,7 +42,7 @@ plot_data <- df_norm %>%
 
 3. Produce the line plot for high and low groups
 ```{r}
-ggplot(plot_data, aes(x = start, y = mean_val, color = Sca12, fill = Sca12)) +
+coverage_plot_all <- ggplot(plot_data, aes(x = start, y = mean_val, color = Sca12, fill = Sca12)) +
   # Shaded area for Standard Deviation
   geom_ribbon(aes(ymin = mean_val - sd_val, ymax = mean_val + sd_val), 
               alpha = 0.2, color = NA) +
@@ -57,14 +57,115 @@ ggplot(plot_data, aes(x = start, y = mean_val, color = Sca12, fill = Sca12)) +
     panel.grid.minor = element_blank(), # Removes minor grid lines
     axis.line = element_line(color = "darkgrey") # Optional: adds clear x/y axes
   ) +
+  scale_x_continuous(
+    breaks = seq(0, max(plot_data$start), by = 200000), # Ticks every 200kb
+    labels = scales::label_number(scale = 1e-3, suffix = "kb") 
+    ) +
+      
   labs(
-    title = "Rickettsia africae Coverage Profile: High vs Low Sca12",
     x = "Genomic Position (bp)",
-    y = "Coverage per million reads (1 Kb window)",
+    y = "Coverage (reads per million)",
     color = "Group (sca12)",
     fill = "Group (sca12)"
-  ) +
-  scale_x_continuous(labels = scales::label_number(scale = 1e-3, suffix = "kb"))
+  ) 
+
+coverage_plot_all 
 ```
 Line represents mean
 Ribbon represents 1SD
+
+```{r}
+library(svglite)
+ggsave("r_africae_coverage_all.svg", coverage_plot_all, device = "svg", width = 8, height = 4)
+```
+
+4. Count how many samples in High (sca12 > 1) or Low (sca12 < 1) groups
+```{r}
+# 1. Simple count of samples in each group
+sample_counts <- df_combined %>%
+  group_by(Sca12) %>%
+  summarise(number_of_samples = n_distinct(IID))
+
+# 2. Print the result
+print(sample_counts)
+```
+
+To check the effect of location on the coverage, made new plots for samples in High or Low groups only:
+
+1. Samples in Low group
+```{r}
+# 1. Filter for Low group and ensure Location is present
+low_group_summary <- df_norm %>%
+  filter(Sca12 == "Low") %>%
+  left_join(meta_df %>% select(IID, Location), by = "IID") %>%
+  # 2. Group by Location and genomic window
+  group_by(start, Location) %>%
+  summarise(
+    mean_val = mean(norm_cov),
+    sd_val = sd(norm_cov),
+    .groups = "drop"
+  )
+
+# 3. Plot Mean + SD Ribbon for each Location
+ggplot(low_group_summary, aes(x = start, y = mean_val, color = Location, fill = Location)) +
+  # Shaded area for variation within each location
+  geom_ribbon(aes(ymin = mean_val - sd_val, ymax = mean_val + sd_val), 
+              alpha = 0.2, color = NA) +
+  # Mean line for each location
+  geom_line(linewidth = 0.7) +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(color = "black")
+  ) +
+  labs(
+    x = "Genomic Position (kb)",
+    y = "Normalized Coverage (RPM)",
+    color = "Location",
+    fill = "Location"
+  ) +
+  scale_x_continuous(
+    breaks = seq(0, max(low_group_summary$start), by = 200000), 
+    labels = scales::label_number(scale = 1e-3, suffix = "kb")
+  )
+```
+
+2. Samples in High group
+```{r}
+# 1. Filter for High group and ensure Location is present
+high_group_summary <- df_norm %>%
+  filter(Sca12 == "High") %>%
+  left_join(meta_df %>% select(IID, Location), by = "IID") %>%
+  # 2. Group by Location and genomic window
+  group_by(start, Location) %>%
+  summarise(
+    mean_val = mean(norm_cov),
+    sd_val = sd(norm_cov),
+    .groups = "drop"
+  )
+
+# 3. Plot Mean + SD Ribbon for each Location (High Group Only)
+ggplot(high_group_summary, aes(x = start, y = mean_val, color = Location, fill = Location)) +
+  # Shaded area for variation within each location
+  geom_ribbon(aes(ymin = mean_val - sd_val, ymax = mean_val + sd_val), 
+              alpha = 0.2, color = NA) +
+  # Mean line for each location
+  geom_line(linewidth = 0.7) +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(color = "black")
+  ) +
+  labs(
+    x = "Genomic Position (kb)",
+    y = "Normalized Coverage (RPM)",
+    color = "Location",
+    fill = "Location"
+  ) +
+  scale_x_continuous(
+    breaks = seq(0, max(high_group_summary$start), by = 200000), 
+    labels = scales::label_number(scale = 1e-3, suffix = "kb")
+  )
+```
