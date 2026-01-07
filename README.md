@@ -1,6 +1,9 @@
 This repository contains the files and scripts used for producing the figures in the publication.
 
-<b>/Avariegatum_seq/03_cameroonticks/14_Ra_snp/ </b>  
+<b>/Avariegatum_seq/qPCR/251030_scatterplot_R/  </b>  
+Scatter plot of sca12 and gltA copy numbers in field-collected ticks
+
+<b>/Avariegatum_seq/03_cameroonticks/14_Ra_snp/  </b>  
 Principal component analysis of SNPs from tick and cell line reads mapped to R.africae ESF-5 chromosome
 
 <b>/Avariegatum_seq/03_cameroonticks/15_Ra_coverage/ </b>   
