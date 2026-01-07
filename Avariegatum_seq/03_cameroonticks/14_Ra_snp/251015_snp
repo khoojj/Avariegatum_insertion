@@ -1,0 +1,109 @@
+
+##map al new data to Ra for SNP analysis
+
+##first convert all cram to fq.gz
+
+for f in */*.cram; do samtools fastq -@ 8 -1 "${f%.cram}_1.fastq.gz" -2 "${f%.cram}_2.fastq.gz" -0 /dev/null -s /dev/null -n "$f"; done
+
+for f in *.cram; do samtools fastq -@ 8 -1 "${f%.cram}_1.fastq.gz" -2 "${f%.cram}_2.fastq.gz" -0 /dev/null -s /dev/null -n "$f"; done &
+
+##map new data to Ra + mito reference
+## fq.gz data in /pub59/jingk/02_Avariegatum/03_cameroonticks/data/all_cam_renamed
+
+bash map_Ra_v1.3.sh 
+
+##assign sample name to each bam file and mark duplicate
+
+sftp://cyber/pub59/jingk/02_Avariegatum/03_cameroonticks/data/all_cam_renamed/02_bam_Ra
+
+bash process_bam_v1.sh
+
+
+#move all ready files to sftp://cyber/pub59/jingk/02_Avariegatum/03_cameroonticks/14_Ra_SNP/01_bam_ready
+
+bash run_freebayes_v1.sh
+##one problematic line found: truncated
+
+
+# 1. Delete the malformed line (NC_012633.1:71445) and pipe to sort/compress.
+sed '/NC_012633.1\t71445/d' freebayes_output_haploid_raw.vcf | \
+bcftools sort -Oz -o sorted_output_variants.vcf.gz
+
+# 2. Index the VCF.
+tabix -p vcf sorted_output_variants.vcf.gz
+
+# -------------------------------------------------------------------------
+# NEW STEP: Split multi-allelic sites into separate biallelic records.
+# This ensures all variant information is kept but is PLINK-compatible later.
+# -------------------------------------------------------------------------
+bcftools norm -m - sorted_output_variants.vcf.gz -Oz -o temp_split.vcf.gz
+tabix -p vcf temp_split.vcf.gz
+
+# 3. Initial filtering (remove indels, minQ 30, and enforce min read depth).
+# Sites are NOT removed based on average depth, allowing low-coverage loci to pass.
+# Individual low-depth calls are set to missing (./.) via --minDP 3.
+vcftools \
+    --gzvcf temp_split.vcf.gz \
+    --remove-indels \
+    --minQ 30 \
+    --minDP 3 \
+    --recode \
+    --recode-INFO-all \
+    --out sorted_output_variants_filt
+
+   #After filtering, kept 2218 out of a possible 153182 Sites
+
+# 4. Rename vcftools output for the next step.
+mv sorted_output_variants_filt.recode.vcf temp_annotated.vcf
+
+# 5. Annotate with unique IDs (CHROM_POS_REF_ALT) and compress the intermediate VCF.
+# FIX: Added %REF and %ALT to ensure unique IDs after multi-allelic splitting.
+bcftools annotate \
+  --set-id '%CHROM\_%POS\_%REF\_%ALT' \
+  temp_annotated.vcf \
+  -Oz -o annotated_all_contigs.vcf.gz
+
+# 6. Index the intermediate VCF.
+tabix -p vcf annotated_all_contigs.vcf.gz
+
+# 7. Filter for NC_012633.1 only.
+bcftools view --regions NC_012633.1 annotated_all_contigs.vcf.gz \
+  -Oz -o final_NC_012633.1_snps.vcf.gz
+
+# 8. Index the final contig-specific VCF.
+tabix -p vcf final_NC_012633.1_snps.vcf.gz
+
+# 9. Clean up intermediate files and report final count.
+rm sorted_output_variants.vcf.gz sorted_output_variants.vcf.gz.tbi temp_split.vcf.gz temp_annotated.vcf annotated_all_contigs.vcf.gz temp_split.vcf.gz.tbi
+
+bcftools view -H final_NC_012633.1_snps.vcf.gz | wc -l
+#1694
+
+
+# 1. Calculate Allele Frequencies
+# Reads the final compressed VCF and calculates allele frequencies for all variants.
+plink2 --vcf final_NC_012633.1_snps.vcf.gz \
+       --double-id \
+       --allow-extra-chr \
+       --freq \
+       --out allele_freqs
+
+#--remove outliers_to_remove.txt \
+
+# 2. Convert to PLINK format (BED/BIM/FAM) and Run PCA
+# Uses the calculated frequencies to handle missing data and runs the PCA.
+plink2 --vcf final_NC_012633.1_snps.vcf.gz \
+       --read-freq allele_freqs.afreq \
+       --double-id \
+       --allow-extra-chr \
+       --make-bed \
+       --pca \
+       --out merged_pca
+
+--read-freq: Frequencies for 1692 variants loaded.
+Warning: 2 entries skipped due to missing variant IDs, mismatching allele
+codes, and/or zero observations.
+
+
+
+

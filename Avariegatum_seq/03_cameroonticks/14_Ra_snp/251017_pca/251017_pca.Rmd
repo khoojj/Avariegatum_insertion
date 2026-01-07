@@ -1,0 +1,163 @@
+---
+title: PCA for SNP mapped to R.africae ESF-5
+
+output: html_notebook
+---
+
+```{r}
+
+library(readr) 
+library(readxl)
+library(dplyr)
+library(ggplot2)
+
+# 1. Load PCA Data and Prepare for Merge
+# Assumes 'merged_pca.eigenvec' and 'merged_pca.eigenval' are in the working directory.
+pca <- read_table("merged_pca.eigenvec", col_names = FALSE)
+eigenval <- scan("merged_pca.eigenval")
+
+# Rename columns based on your structure: X1=IID, X2=PC1, X3=PC2
+names(pca)[1:4] <- c("FID", "IID", "PC1", "PC2")
+
+# 2. Import Metadata from Excel
+# Assumes the metadata is on the first sheet (sheet = 1) of meta.xlsx
+metadata <- read_excel("meta.xlsx", sheet = 1)
+
+# 3. Merge PCA Data with Metadata
+# Use 'IID' as the common key
+pca_merged <- left_join(pca, metadata, by = "IID")
+
+# --- 2. CRITICAL FIX: Ensure PC1 and PC2 are numeric and remove bad row ---
+pca_merged <- pca_merged %>%
+  mutate(
+    # Force conversion to numeric; problematic strings (like "PC1") become NA
+    PC1 = as.numeric(PC1),
+    PC2 = as.numeric(PC2)
+  )
+
+# --- IDENTIFY REMOVED ROW (Optional, for troubleshooting) ---
+ row_to_remove_index <- which(is.na(pca_merged$PC1))
+ if(length(row_to_remove_index) > 0) {
+   print("The following row was identified as non-numeric and will be removed:")
+  print(pca_merged[row_to_remove_index, ])
+ }
+# ---------------------------------------------------------------
+
+# --- 3. Remove the problematic row(s) and finalize the dataframe ---
+pca_merged <- pca_merged %>%
+  na.omit() 
+
+# 4. Calculate Variance Explained for Plot Labels
+total_variance <- sum(eigenval)
+pc1_variance <- round((eigenval[1] / total_variance) * 100, 2)
+pc2_variance <- round((eigenval[2] / total_variance) * 100, 2)
+
+
+```
+```{r}
+
+# Assuming all prior steps (data loading, merging, variance calculation) are complete,
+# and the dataframe 'pca_merged' and variables 'pc1_variance'/'pc2_variance' exist.
+
+# 5. Generate a CLEANER PCA Plot with Reduced Axis Ticks
+p <- ggplot(pca_merged, aes(x = PC1, y = PC2, color = factor(Sca12))) +
+  
+  # --- 1. Ellipses ---
+  #stat_ellipse(aes(group = Sca12), level = 0.95, linewidth = 0.3, type = "t") +
+  
+  # --- 2. Plot Points ---
+  geom_jitter(size = 1, alpha = 0.5, width = 0.0001, height = 0.0001) + 
+  
+  scale_color_manual(
+    values = c(
+      "High" = "#9E0E05",  # Deep Red for 'High'
+      "Low" = "#05579E"    # Dark Blue for 'Low'
+    )
+  ) +
+  
+  guides(color = "none") +
+  
+  # --- 3. Add IID Labels (Anti-overlap) ---
+  geom_text(
+    aes(label = IID), 
+    size = 2.5,          
+    vjust = -0.5,        
+    alpha = 0.7,         
+    check_overlap = TRUE, 
+    show.legend = FALSE
+  ) + 
+  
+  # --- CRITICAL: Reduce Tick Marks on Axes ---
+  # Use scale_continuous with the 'breaks' argument to define fewer ticks.
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 5)) + # Limit x-axis to ~5 ticks
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 5)) + # Limit y-axis to ~5 ticks
+  
+  labs(
+    title = "PCA of Samples Grouped by Sca12 copy numbers",
+    x = paste0("PC1 (", pc1_variance, "%)"),
+    y = paste0("PC2 (", pc2_variance, "%)"),
+    color = "Sca12 Group"
+  ) +
+  theme_minimal() + 
+  geom_hline(yintercept = 0, linetype = "solid", color = "gray90") +
+  geom_vline(xintercept = -0.04, linetype = "solid", color = "gray90") +
+  # Use theme to remove background grid lines for cleanliness
+  theme(
+    panel.grid.major = element_blank(), # Removes the major grid lines
+    panel.grid.minor = element_blank(), # Removes the minor grid lines
+    plot.title = element_blank(),
+
+  ) +
+  
+  coord_cartesian(clip = "off")
+
+p
+
+#save plot
+ggsave("pca_out.svg", plot = p, width = 4, height = 4, units = "in", device = "svg")
+```
+
+
+```{r}
+
+pca_plot_final_zoom <- ggplot(pca_merged, aes(x = PC1, y = PC2, color = factor(Sca12))) +
+  
+  # Ellipses are calculated using the full data (pca_merged)
+  stat_ellipse(
+    aes(group = Sca12), 
+    level = 0.95, 
+    linewidth = 1.2, 
+    type = "t"
+  ) +
+  
+  # Points are plotted using the full data
+  geom_jitter(size = 2.5, alpha = 0.6, width = 0.0001, height = 0.0001) + 
+  
+  # --- CRITICAL: Zoom the viewport to the core cluster's limits ---
+  coord_cartesian(
+    xlim = c(x_min_zoom, x_max_zoom), 
+    ylim = c(y_min_zoom, y_max_zoom)
+  ) +
+  
+  # Optional: Annotate the plot to show outliers exist outside the viewport
+  annotate(
+    "text", x = x_max_zoom * 0.9, y = y_max_zoom * 0.9, 
+    label = "2 Outliers Removed from View", 
+    color = "red", size = 4
+  ) +
+  
+  # Set Final Aesthetics
+  labs(
+    title = "PCA: Zoomed View of Core Genetic Structure",
+    x = paste0("PC1 (", pc1_variance, "%)"),
+    y = paste0("PC2 (", pc2_variance, "%)"),
+    color = "Sca12 Group"
+  ) +
+  theme_minimal() 
+
+print(pca_plot_final_zoom)
+
+
+```
+
+

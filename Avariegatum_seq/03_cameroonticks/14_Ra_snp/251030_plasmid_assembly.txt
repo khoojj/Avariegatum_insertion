@@ -1,0 +1,19 @@
+
+
+samtools view -f 3 -f 64 -b Cam188_plasmid.sorted.bam | samtools fastq - > Cam188_plasmid_R1.fastq &
+samtools view -f 3 -f 128 -b Cam188_plasmid.sorted.bam | samtools fastq - > Cam188_plasmid_R2.fastq &
+
+samtools view -f 3 -f 64 -b Cam184_plasmid.sorted.bam | samtools fastq - > Cam184_plasmid_R1.fastq &
+samtools view -f 3 -f 128 -b Cam184_plasmid.sorted.bam | samtools fastq - > Cam184_plasmid_R2.fastq &
+
+
+
+spades.py -o Cam188_plasmid_spades_assembly_dir \
+  --pe1-1 Cam188_plasmid_R1.fastq \
+  --pe1-2 Cam188_plasmid_R2.fastq\
+  -t 16 
+
+spades.py -o Cam184_plasmid_spades_assembly_dir \
+  --pe1-1 Cam184_plasmid_R1.fastq \
+  --pe1-2 Cam184_plasmid_R2.fastq\
+  -t 16

@@ -1,0 +1,181 @@
+---
+title: PCA for SNP mapped to R.africae ESF-5
+
+output: html_notebook
+---
+
+# load tidyverse package
+```{r}
+library(tidyverse)
+```
+
+# read in data
+```{r}
+pca <- read_table("merged_pca.eigenvec", col_names = FALSE)
+eigenval <- scan("merged_pca.eigenval")
+pca <- pca[-1,-1]
+pca
+```
+```{r}
+pca$X13 <- c("High", "High", "Low", "High", "High", "Low", "High", "Low", "Low", "Low")
+pca <- pca %>%
+  mutate(across(X3:X12, ~ as.numeric(as.character(.))))
+pca
+```
+
+# first convert to percentage variance explained
+```{r}
+pve <- data.frame(PC = 1:10, pve = eigenval/sum(eigenval)*100)
+pve
+```
+
+# make plot
+```{r}
+a <- ggplot(pve, aes(PC, pve)) + geom_bar(stat = "identity")
+a + ylab("Percentage variance explained") + theme_light()
+```
+# PC1 explained most of the variance
+
+# Plot the first and second principal component for cases and contols where the cases are plotted in red and the controls in green.  
+
+```{r}
+# Define jitter amount
+jit <- 0.12
+
+# Adjusted axis limits
+xlim <- range(pca$X3) + c(-jit, jit)
+ylim <- range(pca$X4) + c(-jit, jit)
+
+p <- function() {
+  plot(jitter(pca$X3, amount = jit), jitter(pca$X4, amount = jit), col="white", main="", 
+       xlab="PC1 (48.8%)", ylab="PC2 (20.0%)",
+       xlim = xlim, ylim = ylim, pch = 1)
+  
+  temp_high <- pca[pca$X13 == "High", ]
+  points(jitter(temp_high$X3, amount = jit), jitter(temp_high$X4, amount = jit), 
+         col="#9e0e0599", pch=16, cex = 1.5)
+  
+  temp_low <- pca[pca$X13 == "Low", ]
+  points(jitter(temp_low$X3, amount = jit), jitter(temp_low$X4, amount = jit), 
+         col="#05579e99", pch=16, cex = 1.5)
+  
+  
+  # Legend: top right, inset from the border
+  legend("topright", inset = c(0.05, 0.05), ncol = 1, 
+         legend = c("sca12>=1", "sca12<1"), 
+         col = c("#9e0e0599", "#05579e99"), pch = c(16, 16), 
+         bty = "o")   # bty="o" draws a box
+  
+  # Box outline color
+  box(col = "#ebebebff", lwd = 2)
+}
+
+p()
+
+# Save as SVG
+svg("pca_plot.svg", width = 7, height = 6)
+p()
+dev.off()
+
+```
+
+```{r}
+# Define jitter amount
+jit <- 0.12
+
+# Adjusted axis limits
+xlim <- range(pca$X3) + c(-jit, jit)
+ylim <- range(pca$X4) + c(-jit, jit)
+
+p <- function() {
+  plot(jitter(pca$X3, amount = jit), jitter(pca$X4, amount = jit), col="white", main="", 
+       xlab="PC1 (48.8%)", ylab="PC2 (20.0%)",
+       xlim = xlim, ylim = ylim, pch = 1)
+  
+  temp_high <- pca[pca$X13 == "High", ]
+  points(jitter(temp_high$X3, amount = jit), jitter(temp_high$X4, amount = jit), 
+         col="#9e0e0599", pch=16, cex = 1.5)
+  
+  temp_low <- pca[pca$X13 == "Low", ]
+  points(jitter(temp_low$X3, amount = jit), jitter(temp_low$X4, amount = jit), 
+         col="#05579e99", pch=16, cex = 1.5)
+  
+  # ---- Add centroids ----
+  # Mean centroids
+  centroid_high <- c(mean(temp_high$X3), mean(temp_high$X4))
+  centroid_low  <- c(mean(temp_low$X3), mean(temp_low$X4))
+  
+  points(centroid_high[1], centroid_high[2], pch=4, col="#9e0e05", cex=2, lwd=2) # cross marker
+  points(centroid_low[1], centroid_low[2], pch=4, col="#05579e", cex=2, lwd=2)
+
+  # Optional: Median centroids (robust)
+  # centroid_high <- c(median(temp_high$X3), median(temp_high$X4))
+  # centroid_low  <- c(median(temp_low$X3), median(temp_low$X4))
+  
+  # Legend: top right, inset from the border
+  legend("topright", inset = c(0.05, 0.05), ncol = 1, 
+         legend = c("sca12>=1", "sca12<1"), 
+         col = c("#9e0e0599", "#05579e99"), pch = c(16, 16), 
+         bty = "o")   # bty="o" draws a box
+  
+  # Box outline color
+  box(col = "#ebebebff", lwd = 2)
+}
+
+p()
+```
+```{r}
+# Load needed package
+library(ellipse)  # for drawing ellipses
+
+jit <- 0.12
+
+# Adjusted axis limits
+xlim <- range(pca$X3) + c(-jit, jit)
+ylim <- range(pca$X4) + c(-jit, jit)
+
+p <- function() {
+  plot(jitter(pca$X3, amount = jit), jitter(pca$X4, amount = jit), col="white", main="", 
+       xlab="PC1 (48.8%)", ylab="PC2 (20.0%)",
+       xlim = xlim, ylim = ylim, pch = 1)
+  
+  temp_high <- pca[pca$X13 == "High", ]
+  temp_low  <- pca[pca$X13 == "Low", ]
+  
+  points(jitter(temp_high$X3, amount = jit), jitter(temp_high$X4, amount = jit), 
+         col="#9e0e0599", pch=16, cex = 1.5)
+  points(jitter(temp_low$X3, amount = jit), jitter(temp_low$X4, amount = jit), 
+         col="#05579e99", pch=16, cex = 1.5)
+
+  # ---- Add confidence ellipses ----
+  # Covariance matrices and means
+  cov_high <- cov(temp_high[, c("X3", "X4")])
+  cov_low  <- cov(temp_low[, c("X3", "X4")])
+  
+  center_high <- c(mean(temp_high$X3), mean(temp_high$X4))
+  center_low  <- c(mean(temp_low$X3), mean(temp_low$X4))
+  
+  # 95% confidence ellipse
+  lines(ellipse(cov_high, centre = center_high, level = 0.95), 
+        col="#9e0e05", lwd=2)
+  lines(ellipse(cov_low, centre = center_low, level = 0.95), 
+        col="#05579e", lwd=2)
+  
+  # ---- plot centroids ----
+  points(center_high[1], center_high[2], pch=4, col="#9e0e05", cex=2, lwd=2)
+  points(center_low[1], center_low[2], pch=4, col="#05579e", cex=2, lwd=2)
+  
+  legend("topright", inset = c(0.05, 0.05), ncol = 1, 
+         legend = c("sca12>=1", "sca12<1"), 
+         col = c("#9e0e0599", "#05579e99"), pch = c(16, 16), 
+         bty = "o")   # bty="o" draws a box
+  
+  box(col = "#ebebebff", lwd = 2)
+}
+
+p()
+```
+
+# Labels (keep original coordinates) - not used
+text(pca$X3, pca$X4, labels = pca$X2, pos = 1, cex = 0.7, col = "black")
+
