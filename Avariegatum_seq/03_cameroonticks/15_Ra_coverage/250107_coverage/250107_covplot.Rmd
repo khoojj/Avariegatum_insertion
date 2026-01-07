@@ -1,0 +1,70 @@
+#Coverage plots for tick or cell line reads mapped to Rickettsia africase ESF-5 chromosome sequence
+
+Coverage across the genome in 1kb windows were obtained from Mosdepth
+
+1. Load and merge data
+```{r}
+library(tidyverse)
+library(readxl)
+
+# Load the coverage matrix and the metadata
+coverage_df <- read_excel("r_africae_1kb_coverage.xlsx")
+meta_df <- read_excel("meta.xlsx")
+
+# Pivot coverage to "long" format so we can join by sample ID
+df_long <- coverage_df %>%
+  pivot_longer(cols = -c(chrom, start, end), 
+               names_to = "IID", 
+               values_to = "raw_coverage")
+
+# Join with metadata to get the 'Sca12' column (High/Low)
+df_combined <- df_long %>%
+  left_join(meta_df %>% select(IID, Sca12), by = "IID") %>%
+  filter(!is.na(Sca12)) # Remove samples not in metadata
+```
+2. Normalise and calculate statistics
+```{r}
+# 1. Normalize within each sample by Reads Per Million mapped to the chromosome
+df_norm <- df_combined %>%
+  group_by(IID) %>%
+  mutate(norm_cov = (raw_coverage / sum(raw_coverage)) * 1e6) %>%
+  ungroup()
+
+# 2. Calculate Mean and Error (SD) per genomic window per group
+plot_data <- df_norm %>%
+  group_by(start, Sca12) %>%
+  summarise(
+    mean_val = mean(norm_cov),
+    sd_val = sd(norm_cov),
+    .groups = "drop"
+  )
+```
+
+3. Produce the line plot for high and low groups
+```{r}
+ggplot(plot_data, aes(x = start, y = mean_val, color = Sca12, fill = Sca12)) +
+  # Shaded area for Standard Deviation
+  geom_ribbon(aes(ymin = mean_val - sd_val, ymax = mean_val + sd_val), 
+              alpha = 0.2, color = NA) +
+  # Mean line
+  geom_line(size = 0.7) +
+  scale_color_manual(values = c("High" = "#9e0e0599", "Low" = "#05579e99")) +
+  scale_fill_manual(values = c("High" = "#9e0e0599", "Low" = "#05579e99")) +
+  theme_minimal() +
+  # REMOVE GRID LINES
+  theme(
+    panel.grid.major = element_blank(), # Removes major grid lines
+    panel.grid.minor = element_blank(), # Removes minor grid lines
+    axis.line = element_line(color = "darkgrey") # Optional: adds clear x/y axes
+  ) +
+  labs(
+    title = "Rickettsia africae Coverage Profile: High vs Low Sca12",
+    x = "Genomic Position (bp)",
+    y = "Coverage per million reads (1 Kb window)",
+    color = "Group (sca12)",
+    fill = "Group (sca12)"
+  ) +
+  scale_x_continuous(labels = scales::label_number(scale = 1e-3, suffix = "kb"))
+```
+Line represents mean
+Ribbon represents 1SD
