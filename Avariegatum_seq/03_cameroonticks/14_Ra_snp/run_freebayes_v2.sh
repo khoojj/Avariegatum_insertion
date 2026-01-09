@@ -7,7 +7,7 @@ BAM_DIR="."
 REFERENCE="/pub59/jingk/02_Avariegatum/03_cameroonticks/ncbi_dataset/GCF_000023005.1/Ra_mito.fa"
 
 # Create an output file for the variants
-OUTPUT_VCF="freebayes_output_haploid_raw.vcf"
+OUTPUT_VCF="freebayes_output_haploid_raw_v2.vcf"
 
 # 1. Find all final, processed BAM files with the "_ready.bam" suffix
 BAM_FILES=$(find "$BAM_DIR" -maxdepth 1 -name '*_ready.bam' | xargs)
@@ -23,6 +23,7 @@ fi
 freebayes \
   -f "$REFERENCE" \
   --ploidy 1 \
+  -m 20 \
   --min-alternate-fraction 0.05 \
   -b $BAM_FILES \
   > "$OUTPUT_VCF"

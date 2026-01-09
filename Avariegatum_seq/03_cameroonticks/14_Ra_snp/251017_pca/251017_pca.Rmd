@@ -1,7 +1,5 @@
 ---
-title: PCA for SNP mapped to R.africae ESF-5
-
-output: html_notebook
+PCA for SNP mapped to R.africae ESF-5
 ---
 
 ```{r}
@@ -13,8 +11,8 @@ library(ggplot2)
 
 # 1. Load PCA Data and Prepare for Merge
 # Assumes 'merged_pca.eigenvec' and 'merged_pca.eigenval' are in the working directory.
-pca <- read_table("merged_pca.eigenvec", col_names = FALSE)
-eigenval <- scan("merged_pca.eigenval")
+pca <- read_table("merged_pca_filtered.eigenvec", col_names = FALSE)
+eigenval <- scan("merged_pca_filtered.eigenval")
 
 # Rename columns based on your structure: X1=IID, X2=PC1, X3=PC2
 names(pca)[1:4] <- c("FID", "IID", "PC1", "PC2")
@@ -116,48 +114,3 @@ p
 #save plot
 ggsave("pca_out.svg", plot = p, width = 4, height = 4, units = "in", device = "svg")
 ```
-
-
-```{r}
-
-pca_plot_final_zoom <- ggplot(pca_merged, aes(x = PC1, y = PC2, color = factor(Sca12))) +
-  
-  # Ellipses are calculated using the full data (pca_merged)
-  stat_ellipse(
-    aes(group = Sca12), 
-    level = 0.95, 
-    linewidth = 1.2, 
-    type = "t"
-  ) +
-  
-  # Points are plotted using the full data
-  geom_jitter(size = 2.5, alpha = 0.6, width = 0.0001, height = 0.0001) + 
-  
-  # --- CRITICAL: Zoom the viewport to the core cluster's limits ---
-  coord_cartesian(
-    xlim = c(x_min_zoom, x_max_zoom), 
-    ylim = c(y_min_zoom, y_max_zoom)
-  ) +
-  
-  # Optional: Annotate the plot to show outliers exist outside the viewport
-  annotate(
-    "text", x = x_max_zoom * 0.9, y = y_max_zoom * 0.9, 
-    label = "2 Outliers Removed from View", 
-    color = "red", size = 4
-  ) +
-  
-  # Set Final Aesthetics
-  labs(
-    title = "PCA: Zoomed View of Core Genetic Structure",
-    x = paste0("PC1 (", pc1_variance, "%)"),
-    y = paste0("PC2 (", pc2_variance, "%)"),
-    color = "Sca12 Group"
-  ) +
-  theme_minimal() 
-
-print(pca_plot_final_zoom)
-
-
-```
-
-
