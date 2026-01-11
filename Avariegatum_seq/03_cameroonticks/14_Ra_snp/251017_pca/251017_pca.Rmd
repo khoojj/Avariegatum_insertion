@@ -11,11 +11,11 @@ library(ggplot2)
 
 # 1. Load PCA Data and Prepare for Merge
 # Assumes 'merged_pca.eigenvec' and 'merged_pca.eigenval' are in the working directory.
-pca <- read_table("merged_pca_filtered.eigenvec", col_names = FALSE)
-eigenval <- scan("merged_pca_filtered.eigenval")
+pca <- read_table("merged_pca.eigenvec", col_names = FALSE)
+eigenval <- scan("merged_pca.eigenval")
 
-# Rename columns based on your structure: X1=IID, X2=PC1, X3=PC2
-names(pca)[1:4] <- c("FID", "IID", "PC1", "PC2")
+# Rename columns based on your structure: X1=FID, X2=IID, X3=PC1
+names(pca)[1:5] <- c("FID", "IID", "PC1", "PC2", "PC3")
 
 # 2. Import Metadata from Excel
 # Assumes the metadata is on the first sheet (sheet = 1) of meta.xlsx
@@ -30,7 +30,8 @@ pca_merged <- pca_merged %>%
   mutate(
     # Force conversion to numeric; problematic strings (like "PC1") become NA
     PC1 = as.numeric(PC1),
-    PC2 = as.numeric(PC2)
+    PC2 = as.numeric(PC2),
+    PC3 = as.numeric(PC3)
   )
 
 # --- IDENTIFY REMOVED ROW (Optional, for troubleshooting) ---
@@ -49,6 +50,7 @@ pca_merged <- pca_merged %>%
 total_variance <- sum(eigenval)
 pc1_variance <- round((eigenval[1] / total_variance) * 100, 2)
 pc2_variance <- round((eigenval[2] / total_variance) * 100, 2)
+pc3_variance <- round((eigenval[3] / total_variance) * 100, 2)
 
 
 ```
@@ -114,3 +116,4 @@ p
 #save plot
 ggsave("pca_out.svg", plot = p, width = 4, height = 4, units = "in", device = "svg")
 ```
+

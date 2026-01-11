@@ -98,15 +98,16 @@ plink2 --vcf final_NC_012633.1_snps_v2.vcf.gz \
        --freq \
        --out allele_freqs
 
-# 2. Final PCA with Filtering
+# 2. Final PCA with minimal Filtering
 plink2 --vcf final_NC_012633.1_snps_v2.vcf.gz \
        --read-freq allele_freqs.afreq \
        --double-id \
        --allow-extra-chr \
-       --maf 0.05 \
+       --maf 0.01 \
        --pca \
        --make-bed \
-       --out merged_pca_filtered
+       --out merged_pca
+
 
 ##
 (--maf/--max-maf/--mac/--max-mac).
