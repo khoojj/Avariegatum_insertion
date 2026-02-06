@@ -1,13 +1,21 @@
 ---
-title: "PCA for A.variegatum SNPs mapped to R. africae ESF-5 Chromosome sequence"
+title: "Variant profiles of A. variegatum tick populations with *Rickettsia africae* infection"
 output:
   html_document:
     toc: true
     number_sections: false
     df_print: paged
 ---
----
-Illumina reads from A.variegatum ticks previously assayed with having high (n=15) or low (n=23) copy numbers of the plasmid gene, sca12, were mapped to R. africae ESF-5 chromosome sequence. 
+
+### Aim and hypothesis
+
+**Aim:** Identify *A. variegatum* tick populations with true *Rickettsia africae* infection based on variant (SNP) profile.
+
+**Hypothesis:** Insertion-sequence–derived reads show SNP patterns that differ from reads originating from true R. africae infection.
+
+**Approach:** Illumina reads from *A. variegatum* ticks previously assayed as having high (n = 15) or low (n = 23) copy numbers of the plasmid gene **sca12** were mapped to the *R. africae* ESF-5 chromosome sequence. Variant calling was performed with FreeBayes. PCA was performed with PLINK2.
+
+
 ---
 
 ```{r}

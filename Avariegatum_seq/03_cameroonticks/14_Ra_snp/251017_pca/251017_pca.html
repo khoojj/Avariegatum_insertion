@@ -11,7 +11,7 @@
 
 
 
-<title>PCA for A.variegatum SNPs mapped to R. africae ESF-5 Chromosome sequence</title>
+<title>Variant profiles of A. variegatum tick populations with Rickettsia africae infection</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1619,13 +1619,15 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">PCA for A.variegatum SNPs mapped to R.
-africae ESF-5 Chromosome sequence</h1>
+<h1 class="title toc-ignore">Variant profiles of A. variegatum tick
+populations with <em>Rickettsia africae</em> infection</h1>
 
 </div>
 
 <div id="TOC">
 <ul>
+<li><a href="#aim-and-hypothesis" id="toc-aim-and-hypothesis">Aim and
+hypothesis</a></li>
 <li><a href="#data-inputs" id="toc-data-inputs">Data inputs</a></li>
 <li><a href="#merge-and-qc" id="toc-merge-and-qc">Merge and QC</a></li>
 <li><a href="#variance-explained" id="toc-variance-explained">Variance
@@ -1637,15 +1639,20 @@ findings</a></li>
 </ul>
 </div>
 
-<table>
-<tbody>
-<tr class="odd">
-<td>Illumina reads from A.variegatum ticks previously assayed with
-having high (n=15) or low (n=23) copy numbers of the plasmid gene,
-sca12, were mapped to R. africae ESF-5 chromosome sequence.</td>
-</tr>
-</tbody>
-</table>
+<div id="aim-and-hypothesis" class="section level3">
+<h3>Aim and hypothesis</h3>
+<p><strong>Aim:</strong> Identify <em>A. variegatum</em> tick
+populations with true <em>Rickettsia africae</em> infection based on
+variant (SNP) profile.</p>
+<p><strong>Hypothesis:</strong> Insertion-sequence–derived reads show
+SNP patterns that differ from reads originating from true R. africae
+infection.</p>
+<p><strong>Approach:</strong> Illumina reads from <em>A. variegatum</em>
+ticks previously assayed as having high (n = 15) or low (n = 23) copy
+numbers of the plasmid gene <strong>sca12</strong> were mapped to the
+<em>R. africae</em> ESF-5 chromosome sequence. Variant calling was
+performed with FreeBayes. PCA was performed with PLINK2.</p>
+<hr />
 <pre class="r"><code>#Load libraries
 knitr::opts_chunk$set(echo=TRUE, message=FALSE, warning=FALSE)
 set.seed(1)
@@ -1663,6 +1670,7 @@ library(readr); library(readxl); library(dplyr); library(ggplot2); library(scale
 <pre><code>## The following object is masked from &#39;package:readr&#39;:
 ## 
 ##     col_factor</code></pre>
+</div>
 <div id="data-inputs" class="section level3">
 <h3>Data inputs</h3>
 <p>Eigenvectors and eigenvalues from PLINK2</p>
