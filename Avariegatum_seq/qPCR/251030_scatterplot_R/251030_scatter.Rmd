@@ -1,16 +1,37 @@
-Make scatter plot for sca12/gltA
+---
+title: "Tick screening for Rickettsia africae (qPCR)"
+output:
+  html_document:
+    toc: true
+    number_sections: false
+    df_print: paged
 
-Import data
+---
+### Aim and hypothesis
+
+**Aim:** Identify A.variegatum tick populations with true *Rickettsia africae* infection.
+
+**Hypothesis:** R. africae-infected ticks carry a high copy number of sca12, a plasmid-borne marker (sca12 is found only on the plasmid). Uninfected ticks are expected to lack the plasmid (and therefore sca12), but may still be positive for gltA, since gltA is present in the chromosomally integrated bacterial sequence.
+
+**Approach:** Copy numbers are determined by qPCR and normalized to a tick single-copy nuclear reference gene (rpl6).
+
+---
+
 ```{r}
-library(readxl)
+#Load libraries
+knitr::opts_chunk$set(echo=TRUE, message=FALSE, warning=FALSE)
+set.seed(1)
+library(readxl); library(ggplot2)
+```
 
+### Data inputs
+```{r}
 scatter <- read_excel("scatter.xlsx")
 head(scatter)
 ```
 
-Make scatter plot
+### Make scatter plot
 ```{r}
-library(ggplot2)
 
 p <- ggplot(scatter, aes(x = gltA, y = sca12)) +
   geom_point(aes(color = sca12 >= 1), size = 2)  +
@@ -27,10 +48,16 @@ p <- ggplot(scatter, aes(x = gltA, y = sca12)) +
 
 # Show plot
 p
+```
 
+### Summary findings
+A population of ticks with >=1 copy of sca12 and positive in gltA were observed. These ticks were grouped as sca12>=1 in further analysis.
+
+### Save plot
+```{r}
 #save plot
 ggsave("scatter_plot.svg", plot = p, width = 7, height = 5, units = "in", device = "svg")
-
+```
 
 
 ```
