@@ -1,13 +1,11 @@
 #!/bin/bash
 
-# Ensure the script exits immediately if any command fails
-set -e
 
 # --- CONFIGURATION ---
 # Set the main directory where all sample folders reside
 main_directory="/pub59/jingk/02_Avariegatum/03_cameroonticks/data/all_cam_renamed"
 export BOWTIE2_INDEXES=/pub59/jingk/02_Avariegatum/03_cameroonticks/ncbi_dataset/GCF_000023005.1
-NUM_JOBS=5 # The number of concurrent jobs for GNU Parallel
+NUM_JOBS=5 # The number of concurrent jobs for GNU Parallel 5 * (8+8) = 80 threads max)
 
 # --- CONSOLIDATION FUNCTION (Executed by GNU Parallel) ---
 
