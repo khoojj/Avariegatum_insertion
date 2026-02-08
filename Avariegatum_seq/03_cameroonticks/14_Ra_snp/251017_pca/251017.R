@@ -1,0 +1,129 @@
+---
+  title: "Variant profiles of A. variegatum tick populations with *Rickettsia africae* infection"
+output:
+  html_document:
+  toc: true
+number_sections: false
+df_print: paged
+---
+  
+
+  
+
+#Load libraries
+knitr::opts_chunk$set(echo=TRUE, message=FALSE, warning=FALSE)
+set.seed(1)
+library(readr); library(readxl); library(dplyr); library(ggplot2); library(scales)
+
+
+### Data inputs
+
+# 1. Load PCA Data and Prepare for Merge
+# Assumes 'merged_pca.eigenvec' and 'merged_pca.eigenval' are in the working directory.
+pca <- read_table("merged_pca.eigenvec", col_names = FALSE)
+eigenval <- scan("merged_pca.eigenval")
+
+# Rename columns based on structure: X1=FID, X2=IID, X3=PC1
+names(pca)[1:5] <- c("FID", "IID", "PC1", "PC2", "PC3")
+
+# 2. Import Metadata from Excel
+# Assumes the metadata is on the first sheet (sheet = 1) of meta.xlsx
+metadata <- read_excel("meta.xlsx", sheet = 1)
+
+
+### Merge and QC
+
+# 3. Merge PCA Data with Metadata
+# Use 'IID' as the common key
+pca_merged <- left_join(pca, metadata, by = "IID")
+
+# --- 2. Ensure PC1 and PC2 are numeric and remove bad row ---
+pca_merged <- pca_merged %>%
+  mutate(
+    # Force conversion to numeric; problematic strings (like "PC1") become NA
+    PC1 = as.numeric(PC1),
+    PC2 = as.numeric(PC2),
+    PC3 = as.numeric(PC3)
+  )
+
+# --- IDENTIFY REMOVED ROW (Optional, for troubleshooting) ---
+row_to_remove_index <- which(is.na(pca_merged$PC1))
+if(length(row_to_remove_index) > 0) {
+  print("The following row was identified as non-numeric and will be removed:")
+  print(pca_merged[row_to_remove_index, ])
+}
+# ---------------------------------------------------------------
+
+# --- 3. Remove the problematic row(s) and finalize the dataframe ---
+pca_merged <- pca_merged %>%
+  na.omit() 
+
+
+### Variance explained
+
+# 4. Calculate Variance Explained for Plot Labels
+total_variance <- sum(eigenval)
+pc1_variance <- round((eigenval[1] / total_variance) * 100, 2)
+pc2_variance <- round((eigenval[2] / total_variance) * 100, 2)
+pc3_variance <- round((eigenval[3] / total_variance) * 100, 2)
+
+
+### Plot
+
+# 5. Generate a PCA Plot with reduced axis ticks
+p <- ggplot(pca_merged, aes(x = PC1, y = PC2, color = factor(Sca12))) +
+  
+  # --- 1. Plot Points ---
+  geom_jitter(size = 1, alpha = 0.5, width = 0.01, height = 0.01) + 
+  
+  scale_color_manual(
+    values = c(
+      "High" = "#9E0E05",  # Deep Red for 'High'
+      "Low" = "#05579E"    # Dark Blue for 'Low'
+    )
+  ) +
+  
+  guides(color = "none") +
+  
+  # --- 2. Add IID Labels (Anti-overlap) ---
+  geom_text(
+    aes(label = IID), 
+    size = 2.5,          
+    vjust = -0.5,        
+    alpha = 0.7,         
+    check_overlap = TRUE, 
+    show.legend = FALSE
+  ) + 
+  
+  # Use scale_continuous with the 'breaks' argument to define fewer ticks.
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 5)) + # Limit x-axis to ~5 ticks
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 5)) + # Limit y-axis to ~5 ticks
+  
+  labs(
+    title = "PCA of Samples Grouped by Sca12 copy numbers",
+    x = paste0("PC1 (", pc1_variance, "%)"),
+    y = paste0("PC2 (", pc2_variance, "%)"),
+    color = "Sca12 Group"
+  ) +
+  theme_minimal() + 
+  geom_hline(yintercept = 0, linetype = "solid", color = "gray90") +
+  geom_vline(xintercept = -0.04, linetype = "solid", color = "gray90") +
+  # Use theme to remove background grid lines for cleanliness
+  theme(
+    panel.grid.major = element_blank(), # Removes the major grid lines
+    panel.grid.minor = element_blank(), # Removes the minor grid lines
+    plot.title = element_blank(),
+    
+  ) +
+  
+  coord_cartesian(clip = "off")
+
+p
+
+
+### Save plot
+
+#save plot
+ggsave("pca_out.svg", plot = p, width = 4, height = 4, units = "in", device = "svg")
+
+
