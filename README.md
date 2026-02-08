@@ -25,8 +25,10 @@ Identify *Amblyomma variegatum* tick populations with true *Rickettsia africae* 
 Directory: `/Avariegatum_seq/03_cameroonticks/14_Ra_snp/`  
 
 **Files and directories:** 
+
 PCA analysis (R Markdown):  
 `/Avariegatum_seq/03_cameroonticks/14_Ra_snp/251017_pca/`  
+
 Upstream scripts and command log (generate inputs for PCA):    
 `/Avariegatum_seq/03_cameroonticks/14_Ra_snp/scripts/`  
 Mapping: map_Ra_v1.3.sh  
