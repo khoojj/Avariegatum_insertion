@@ -15,7 +15,7 @@ Screening for *Rickettsia africae* infection in *Amblyomma variegatum* ticks bas
 
 **Hypothesis:** sca12 is detected in ticks with actual infection even though gltA could be detected in all ticks regardless of infection status. 
 
-**Approach:** qPCR assays targeting sca12 and gltA were performed. Target copy numbers were normalized to a tick housekeeping gene. A scatter plot of normalized sca12 vs gltA values was generated in R to assess co-detection across samples. The resulting table was used as sample-level metadata for downstream variant calling and coverage analyses (see the following section).
+**Approach:** qPCR assays targeting sca12 and gltA were performed. Target copy numbers were normalized to a tick housekeeping gene. A scatter plot of normalized sca12 vs gltA values was generated in R to assess co-detection across samples. The results were used as sample-level metadata for downstream variant calling and coverage analyses (see the following section).
 
 Directory: `/Avariegatum_seq/qPCR/251030_scatterplot_R/`  
 - [Visualisation in R markdown](https://khoojj.github.io/Avariegatum_insertion/251030_scatter.html)
