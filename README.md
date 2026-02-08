@@ -16,11 +16,11 @@ Directory: `/Avariegatum_seq/qPCR/251030_scatterplot_R/`
 **Principal component analysis** of SNPs from tick and cell line reads mapped to *R. africae* ESF-5 chromosome.  
 
 **Aim:** 
-Identify Amblyomma variegatum tick populations with true *Rickettsia africae* infection based on variant (SNP) profiles.  
+Identify *Amblyomma variegatum* tick populations with true *Rickettsia africae* infection based on variant (SNP) profiles.  
 
-**Hypothesis:** Insertion-sequence–derived reads show SNP patterns that differ from reads originating from true R. africae infection.  
+**Hypothesis:** Insertion-sequence–derived reads show SNP patterns that differ from reads originating from true *R. africae* infection.  
 
-**Approach:** Illumina reads from A. variegatum ticks previously assayed as having high (n = 15) or low (n = 23) copy numbers of the plasmid gene sca12 were mapped to the *R. africae* ESF-5 chromosome sequence. Read groups were added and duplicate reads were marked using Picard. Variant calling was performed with FreeBayes, followed by filtering and restriction to the mitochondrial contig. Principal component analysis (PCA) was performed using PLINK2, with downstream visualisation and interpretation in R.  
+**Approach:** Illumina reads from *A. variegatum* ticks previously assayed as having high (n = 15) or low (n = 23) copy numbers of the plasmid gene sca12 were mapped to the *R. africae* ESF-5 chromosome sequence. Read groups were added and duplicate reads were marked using Picard. Variant calling was performed with FreeBayes, followed by filtering and restriction to the mitochondrial contig. Principal component analysis (PCA) was performed using PLINK2, with downstream visualisation and interpretation in R.  
 
 Directory: `/Avariegatum_seq/03_cameroonticks/14_Ra_snp/`  
 
