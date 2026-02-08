@@ -1,1 +1,7 @@
+# Don’t count rendered outputs toward language stats
+*.html linguist-generated=true
+*.css linguist-generated=true
+*.js linguist-generated=true
+
+
 docs/* linguist-generated=true
