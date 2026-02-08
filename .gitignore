@@ -1,6 +1,9 @@
-/Users/jing/Library/CloudStorage/OneDrive-Personal/AVL/Avariegatum_seq/03_cameroonticks/14_Ra_snp/251030_plasmid_assembly.txt
-/Users/jing/Library/CloudStorage/OneDrive-Personal/AVL/Avariegatum_seq/03_cameroonticks/14_Ra_snp/plasmid_coverage_summary.tsv
-/Users/jing/Library/CloudStorage/OneDrive-Personal/AVL/Avariegatum_seq/03_cameroonticks/14_Ra_snp/251017_pca/.Rhistory
-/Users/jing/Library/CloudStorage/OneDrive-Personal/AVL/Avariegatum_seq/03_cameroonticks/14_Ra_snp/251017_pca/.RData
-/Users/jing/Library/CloudStorage/OneDrive-Personal/AVL/Avariegatum_seq/03_cameroonticks/14_Ra_snp/251017_pca/.Rproj.user
-/Users/jing/Library/CloudStorage/OneDrive-Personal/AVL/Avariegatum_seq/03_cameroonticks/14_Ra_snp/251015_snp
+# Specific files
+Avariegatum_seq/03_cameroonticks/14_Ra_snp/251030_plasmid_assembly.txt
+Avariegatum_seq/03_cameroonticks/14_Ra_snp/plasmid_coverage_summary.tsv
+Avariegatum_seq/03_cameroonticks/14_Ra_snp/251015_snp
+
+# R session clutter (anywhere)
+.Rhistory
+.RData
+.Rproj.user/
