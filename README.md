@@ -9,6 +9,14 @@ The code reflects how the analyses were performed for this study and is intended
 
 ### Tick screening for *Rickettsia africae* (qPCR, scatter plot)
 **Scatter plot** of sca12 and gltA copy numbers in field-collected ticks.  
+
+**Aim:** 
+Screening for *Rickettsia africae* infection in *Amblyomma variegatum* ticks based on a qPCR assay for the plasmid sca12 gene, which should only be present in live bacteria, and the standard gltA qPCR assay.
+
+**Hypothesis:** sca12 is detected in ticks with actual infection even though gltA could be detected in all ticks regardless of infection status. 
+
+**Approach:** qPCR assays targeting sca12 and gltA were performed. Target copy numbers were normalized to a tick housekeeping gene. A scatter plot of normalized sca12 vs gltA values was generated in R to assess co-detection across samples. The resulting table was used as sample-level metadata for downstream variant calling and coverage analyses (see the following section).
+
 Directory: `/Avariegatum_seq/qPCR/251030_scatterplot_R/`  
 - [Visualisation in R markdown](https://khoojj.github.io/Avariegatum_insertion/251030_scatter.html)
 
