@@ -1641,17 +1641,18 @@ findings</a></li>
 
 <div id="aim-and-hypothesis" class="section level3">
 <h3>Aim and hypothesis</h3>
-<p><strong>Aim:</strong> Identify <em>A. variegatum</em> tick
-populations with true <em>Rickettsia africae</em> infection based on
-variant (SNP) profile.</p>
-<p><strong>Hypothesis:</strong> Insertion-sequence–derived reads show
-SNP patterns that differ from reads originating from true R. africae
-infection.</p>
-<p><strong>Approach:</strong> Illumina reads from <em>A. variegatum</em>
-ticks previously assayed as having high (n = 15) or low (n = 23) copy
-numbers of the plasmid gene <strong>sca12</strong> were mapped to the
-<em>R. africae</em> ESF-5 chromosome sequence. Variant calling was
-performed with FreeBayes. PCA was performed with PLINK2.</p>
+<p><strong>Aim:</strong> Identify <em>A. varigatum</em> tick populations
+with actual <em>R. africae</em> infection based on variant (SNP)
+profiles.</p>
+<p><strong>Hypothesis:</strong> SNP patterns differ between putatively
+infected and uninfected tick populations.</p>
+<p><strong>Approach:</strong> Illumina reads from putatively infected
+and uninfected ticks were mapped to the <em>R. africae</em> ESF-5
+chromosome sequence. Read groups were added and duplicate reads were
+marked using Picard. Variant calling was performed with FreeBayes,
+followed by filtering and restriction to the mitochondrial contig.
+Principal component analysis (PCA) was performed using PLINK2, with
+downstream visualisation and interpretation in R.</p>
 <hr />
 <pre class="r"><code>#Load libraries
 knitr::opts_chunk$set(echo=TRUE, message=FALSE, warning=FALSE)
@@ -1782,9 +1783,9 @@ p</code></pre>
 </div>
 <div id="summary-findings" class="section level3">
 <h3>Summary findings</h3>
-<p>Population with low sca12 copies were clustered distintly from
-populations with high sca12 copies. There could be more than 1
-population of ticks with high sca12 copies.</p>
+<p>Uninfected population (low) were clustered separately from putatively
+infected population (high). There could be more than 1 distinct
+putatively infected population</p>
 </div>
 <div id="save-plot" class="section level3">
 <h3>Save plot</h3>
