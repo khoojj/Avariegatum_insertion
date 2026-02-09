@@ -9,11 +9,12 @@ output:
 
 ### Aim and hypothesis
 
-**Aim:** Identify *A. variegatum* tick populations with true *Rickettsia africae* infection based on variant (SNP) profile.
+**Aim:** 
+Identify *A. varigatum* tick populations with actual *R. africae* infection based on variant (SNP) profiles.  
 
-**Hypothesis:** Insertion-sequence–derived reads show SNP patterns that differ from reads originating from true R. africae infection.
+**Hypothesis:**  SNP patterns differ between putatively infected and uninfected tick populations.
 
-**Approach:** Illumina reads from *A. variegatum* ticks previously assayed as having high (n = 15) or low (n = 23) copy numbers of the plasmid gene **sca12** were mapped to the *R. africae* ESF-5 chromosome sequence. Variant calling was performed with FreeBayes. PCA was performed with PLINK2.
+**Approach:** Illumina reads from putatively infected and uninfected ticks were mapped to the *R. africae* ESF-5 chromosome sequence. Read groups were added and duplicate reads were marked using Picard. Variant calling was performed with FreeBayes, followed by filtering and restriction to the mitochondrial contig. Principal component analysis (PCA) was performed using PLINK2, with downstream visualisation and interpretation in R.
 
 
 ---
@@ -136,8 +137,8 @@ p
 
 
 ### Summary findings
-Population with low sca12 copies were clustered distintly from populations with high sca12 copies.
-There could be more than 1 population of ticks with high sca12 copies.
+Uninfected population (low) were clustered separately from putatively infected population (high).
+There could be more than 1 distinct putatively infected population
 
 
 ### Save plot

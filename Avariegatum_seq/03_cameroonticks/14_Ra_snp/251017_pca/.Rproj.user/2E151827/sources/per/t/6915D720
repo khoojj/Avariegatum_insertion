@@ -3,7 +3,7 @@
     "path": "~/Library/CloudStorage/OneDrive-Personal/AVL/Avariegatum_seq/03_cameroonticks/14_Ra_snp/251017_pca/251017_pca.Rmd",
     "project_path": "251017_pca.Rmd",
     "type": "r_markdown",
-    "hash": "343201168",
+    "hash": "1513276524",
     "contents": "",
     "dirty": false,
     "created": 1760696816909.0,
@@ -13,15 +13,15 @@
         "chunk_output_type": "inline",
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "1,28",
-        "scrollLine": "0"
+        "cursorPosition": "139,53",
+        "scrollLine": "136"
     },
     "folds": "",
-    "lastKnownWriteTime": 1770419625,
+    "lastKnownWriteTime": 1770624827,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1770419625020,
+    "last_content_update": 1770624827879,
     "read_only": false,
     "read_only_alternatives": []
 }

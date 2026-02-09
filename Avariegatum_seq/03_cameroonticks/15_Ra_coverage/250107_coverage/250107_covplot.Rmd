@@ -1,11 +1,30 @@
-#Coverage plots for tick or cell line reads mapped to Rickettsia africase ESF-5 chromosome sequence
+---
+title: "Coverage plots for A.variegatum reads mapped to Rickettsia africase ESF-5 chromosome sequence"
+output:
+  html_document:
+    toc: true
+    number_sections: false
+    df_print: paged
+---
 
-Coverage across the genome in 1kb windows were obtained from Mosdepth
+**Aim:** 
+Identify *A. varigatum* tick populations with actual *R. africae* infection based on coverage profiles.  
 
+**Hypothesis:** Putatively infected ticks have even coverage across the *R. africae* genome while uninfected ticks have uneven coverage due to missing regions in the tick-genome-integrated sequence.   
+
+**Approach:** Mapping bam files from the variant analysis were used to generate coverage profile across the *R. africae* genome in 1kb windows using Mosdepth, with downstream statistical analysis and visualisation in R. 
+
+---
+```{r}
+#Load libraries
+knitr::opts_chunk$set(echo=TRUE, message=FALSE, warning=FALSE)
+set.seed(1)
+library(tidyverse); library(readxl); library(svglite)
+```
+
+### Data inputs
 1. Load and merge data
 ```{r}
-library(tidyverse)
-library(readxl)
 
 # Load the coverage matrix and the metadata
 coverage_df <- read_excel("r_africae_1kb_coverage.xlsx")
@@ -22,7 +41,8 @@ df_combined <- df_long %>%
   left_join(meta_df %>% select(IID, Sca12), by = "IID") %>%
   filter(!is.na(Sca12)) # Remove samples not in metadata
 ```
-2. Normalise and calculate statistics
+
+### Normalise and calculate statistics
 ```{r}
 # 1. Normalize within each sample by Reads Per Million mapped to the chromosome
 df_norm <- df_combined %>%
@@ -40,7 +60,7 @@ plot_data <- df_norm %>%
   )
 ```
 
-3. Produce the line plot for high and low groups
+### Produce the line plot for high (putatively infected) and low (uninfected) groups
 ```{r}
 coverage_plot_all <- ggplot(plot_data, aes(x = start, y = mean_val, color = Sca12, fill = Sca12)) +
   # Shaded area for Standard Deviation
@@ -71,15 +91,19 @@ coverage_plot_all <- ggplot(plot_data, aes(x = start, y = mean_val, color = Sca1
 
 coverage_plot_all 
 ```
+Legend: 
 Line represents mean
 Ribbon represents 1SD
 
+### Summary findings
+Distinct coverage profiles in putatively infected (high) and uninfected (low) populations.
+
+### Save plot
 ```{r}
-library(svglite)
 ggsave("r_africae_coverage_all.svg", coverage_plot_all, device = "svg", width = 8, height = 4)
 ```
 
-4. Count how many samples in High (sca12 > 1) or Low (sca12 < 1) groups
+### Count how many samples in High (sca12 > 1) or Low (sca12 < 1) groups
 ```{r}
 # 1. Simple count of samples in each group
 sample_counts <- df_combined %>%
@@ -90,9 +114,10 @@ sample_counts <- df_combined %>%
 print(sample_counts)
 ```
 
-To check the effect of location on the coverage, made new plots for samples in High or Low groups only:
+### Check the effect of location on the coverage
+Made new plots for samples in High or Low groups only:
 
-1. Samples in Low group
+#### Samples in Low group
 ```{r}
 # 1. Filter for Low group and ensure Location is present
 low_group_summary <- df_norm %>%
@@ -131,7 +156,7 @@ ggplot(low_group_summary, aes(x = start, y = mean_val, color = Location, fill = 
   )
 ```
 
-2. Samples in High group
+#### Samples in High group
 ```{r}
 # 1. Filter for High group and ensure Location is present
 high_group_summary <- df_norm %>%
@@ -169,3 +194,7 @@ ggplot(high_group_summary, aes(x = start, y = mean_val, color = Location, fill =
     labels = scales::label_number(scale = 1e-3, suffix = "kb")
   )
 ```
+
+### Summary findings
+Distinct coverage profiles in putatively infected (high) and uninfected (low) populations.
+Not affected by location.
