@@ -1,8 +1,0 @@
-#Make coverage plot across the R.africae chromosome.
-##first calculate coverage using mosdepth and previous bam files for snp analysis. 
-
-bash run_mosdepth_1kb.sh
-
-##then combine the output region files
-
-python combine_coverage.py
